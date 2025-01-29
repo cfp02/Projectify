@@ -71,56 +71,88 @@ export default function ProjectsPage() {
   };
 
   if (status === "loading" || loading) {
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-[#1a1b26] text-emerald-400">
+        <div className="animate-pulse">Loading...</div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-red-500">Error: {error}</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-[#1a1b26]">
+        <div className="text-orange-500 bg-orange-950/30 px-4 py-2 rounded-md border border-orange-800/50">
+          Error: {error}
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">My Projects</h1>
-        <button
-          onClick={createProject}
-          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-        >
-          Create Project
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map((project) => (
-          <Link
-            key={project.id}
-            href={`/projects/${project.id}`}
-            className="block border rounded-lg p-6 hover:shadow-lg transition-all hover:border-indigo-300 cursor-pointer"
+    <div className="min-h-screen bg-[#1a1b26] text-gray-100 py-8 px-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-12">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+              My Projects
+            </h1>
+            <p className="text-gray-400 mt-2">Manage and track your development projects</p>
+          </div>
+          <button
+            onClick={createProject}
+            className="bg-emerald-500 hover:bg-emerald-400 text-gray-900 px-6 py-3 rounded-lg 
+                     font-medium transition-all duration-200 transform hover:scale-105 
+                     hover:shadow-[0_0_15px_rgba(52,211,153,0.3)] active:scale-95"
           >
-            <div>
-              <h2 className="text-xl font-semibold mb-2 text-indigo-600">{project.title}</h2>
-              {project.subtitle && (
-                <p className="text-gray-600 mb-2">{project.subtitle}</p>
-              )}
-              {project.description && (
-                <p className="text-gray-500 mb-4 line-clamp-2">{project.description}</p>
-              )}
-              <div className="flex flex-wrap gap-2">
-                {project.tags.map((tag) => (
-                  <span
-                    key={tag.id}
-                    className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-sm"
-                  >
-                    {tag.name}
+            + New Project
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.map((project) => (
+            <Link
+              key={project.id}
+              href={`/projects/${project.id}`}
+              className="group block rounded-xl bg-[#24273a] p-6 
+                       transition-all duration-300 hover:shadow-[0_0_25px_rgba(52,211,153,0.1)]
+                       border border-gray-800/50 hover:border-emerald-500/30
+                       relative overflow-hidden"
+            >
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-4">
+                  <h2 className="text-xl font-bold text-emerald-400 group-hover:text-emerald-300">
+                    {project.title}
+                  </h2>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium
+                    ${project.status === 'active' 
+                      ? 'bg-emerald-400/10 text-emerald-400' 
+                      : 'bg-gray-700/50 text-gray-400'}`}>
+                    {project.status}
                   </span>
-                ))}
+                </div>
+                {project.subtitle && (
+                  <p className="text-gray-400 mb-2 font-medium">{project.subtitle}</p>
+                )}
+                {project.description && (
+                  <p className="text-gray-500 mb-4 line-clamp-2">{project.description}</p>
+                )}
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {project.tags.map((tag) => (
+                    <span
+                      key={tag.id}
+                      className="px-3 py-1 rounded-full text-xs font-medium
+                               bg-[#1a1b26] text-cyan-400 border border-cyan-950"
+                    >
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div className="mt-4 text-sm text-gray-500">
-                Status: <span className="capitalize">{project.status}</span>
-              </div>
-            </div>
-          </Link>
-        ))}
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/3 to-cyan-500/3 
+                            opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
