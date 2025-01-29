@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
-import { ThemeSelector } from "@/components/ThemeSelector";
 
 interface Project {
   id: string;
@@ -107,8 +106,7 @@ export default function ProjectsPage() {
               Manage and track your development projects
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <ThemeSelector />
+          <div>
             <Link
               href="/projects/new"
               className="px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95"

@@ -41,7 +41,10 @@ export function TopBar() {
         <div className="flex items-center gap-4">
           <ThemeSelector />
           {session?.user && (
-            <div className="flex items-center gap-3">
+            <Link
+              href="/profile"
+              className="flex items-center gap-3 px-3 py-2 rounded-md transition-colors duration-200 hover:bg-black/5"
+            >
               <span style={{ color: currentTheme.colors.text.secondary }}>
                 {session.user.name}
               </span>
@@ -54,7 +57,7 @@ export function TopBar() {
                   className="rounded-full"
                 />
               )}
-            </div>
+            </Link>
           )}
         </div>
       </div>

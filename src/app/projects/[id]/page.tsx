@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
-import { ThemeSelector } from "@/components/ThemeSelector";
 
 interface Tag {
   id: string;
@@ -162,7 +161,6 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
             <span>←</span>
             <span>Back to Projects</span>
           </Link>
-          <ThemeSelector />
         </div>
 
         <div className="rounded-xl p-6" style={{ 
