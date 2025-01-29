@@ -100,7 +100,7 @@ export default function ProjectsPage() {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-12">
           <div>
-            <h1 className={`text-4xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${currentTheme.gradients.heading}`}>
+            <h1 className="text-4xl font-bold mb-1" style={{ color: currentTheme.colors.primary }}>
               My Projects
             </h1>
             <p style={{ color: currentTheme.colors.text.secondary }}>

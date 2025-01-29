@@ -76,7 +76,7 @@ export const themes: { [key: string]: Theme } = {
       },
     },
     gradients: {
-      heading: 'from-[#7aa2f7] to-[#7dcfff]',
+      heading: 'from-[#7aa2f7] via-[#bb9af7] to-[#7dcfff]',
       cardHover: 'from-[#7aa2f7]/3 to-[#7dcfff]/3',
     },
     shadows: {
@@ -118,7 +118,7 @@ export const themes: { [key: string]: Theme } = {
       },
     },
     gradients: {
-      heading: 'from-[#F92AAD] to-[#2AFFEA]',
+      heading: 'from-[#FF2AAD] via-[#FF2A76] to-[#2AFFEA]',
       cardHover: 'from-[#F92AAD]/3 to-[#2AFFEA]/3',
     },
     shadows: {
@@ -160,7 +160,7 @@ export const themes: { [key: string]: Theme } = {
       },
     },
     gradients: {
-      heading: 'from-emerald-400 to-cyan-400',
+      heading: 'from-[#10B981] via-[#34D399] to-[#22D3EE]',
       cardHover: 'from-emerald-500/3 to-cyan-500/3',
     },
     shadows: {

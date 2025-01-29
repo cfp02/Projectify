@@ -85,7 +85,31 @@ If you've already set up the project and are returning to development:
 - ✅ Database schema
 - ✅ Authentication system
 - ✅ Basic UI structure
+- ✅ Theme system with multiple themes
 - 🚧 Project management features (In Progress)
+
+### Features
+1. **Authentication**
+   - Google and GitHub sign-in
+   - Secure session management
+   - Protected routes
+
+2. **Theme System**
+   - Multiple built-in themes:
+     - Tokyo Night (Cool blue/purple theme)
+     - Cyberpunk (Vibrant pink/cyan theme)
+     - Emerald Sea (Modern green/cyan theme)
+   - Theme persistence across sessions
+   - Easy theme switching via dropdown
+   - Consistent styling across all pages
+   - Gradient text and hover effects
+
+3. **Project Management**
+   - Create and edit projects
+   - Tag system
+   - Activity tracking
+   - Resource management
+   - Section organization
 
 ## Project Phases
 

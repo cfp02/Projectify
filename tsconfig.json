@@ -1,5 +1,4 @@
 {
-  "$schema": "node_modules/@types/json-schema/raw-schema.json",
   "compilerOptions": {
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],

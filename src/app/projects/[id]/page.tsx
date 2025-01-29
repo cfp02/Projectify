@@ -4,6 +4,8 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTheme } from "@/contexts/ThemeContext";
+import { ThemeSelector } from "@/components/ThemeSelector";
 
 interface Tag {
   id: string;
@@ -44,6 +46,7 @@ interface Project {
 }
 
 export default function ProjectPage({ params }: { params: { id: string } }) {
+  const { currentTheme } = useTheme();
   const { data: session, status } = useSession();
   const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
@@ -113,156 +116,251 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
   };
 
   if (status === "loading" || loading) {
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen" 
+           style={{ backgroundColor: currentTheme.colors.background }}>
+        <div className="animate-pulse" style={{ color: currentTheme.colors.primary }}>
+          Loading...
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-red-500">Error: {error}</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen" 
+           style={{ backgroundColor: currentTheme.colors.background }}>
+        <div className="px-4 py-2 rounded-md border" style={{
+          color: currentTheme.colors.status.inactive.text,
+          backgroundColor: currentTheme.colors.status.inactive.background,
+          borderColor: currentTheme.colors.border.default,
+        }}>
+          Error: {error}
+        </div>
+      </div>
+    );
   }
 
   if (!project) {
-    return <div>Project not found</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen" 
+           style={{ backgroundColor: currentTheme.colors.background }}>
+        <div style={{ color: currentTheme.colors.text.primary }}>Project not found</div>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <Link
-          href="/projects"
-          className="text-indigo-600 hover:text-indigo-800"
-        >
-          ← Back to Projects
-        </Link>
-      </div>
+    <div className="min-h-screen py-8 px-4" style={{ backgroundColor: currentTheme.colors.background }}>
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <Link
+            href="/projects"
+            className="flex items-center gap-2 transition-colors duration-200"
+            style={{ color: currentTheme.colors.primary }}
+          >
+            <span>←</span>
+            <span>Back to Projects</span>
+          </Link>
+          <ThemeSelector />
+        </div>
 
-      <div className="bg-white shadow-lg rounded-lg p-6">
-        <div className="flex justify-between items-start mb-6">
-          <div className="flex-1">
+        <div className="rounded-xl p-6" style={{ 
+          backgroundColor: currentTheme.colors.cardBackground,
+          boxShadow: `0 0 0 1px ${currentTheme.colors.border.default}`,
+        }}>
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex-1">
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={editedProject.title || ""}
+                  onChange={(e) =>
+                    setEditedProject({ ...editedProject, title: e.target.value })
+                  }
+                  className="w-full mb-2 p-2 rounded-lg"
+                  style={{
+                    backgroundColor: currentTheme.colors.background,
+                    color: currentTheme.colors.text.primary,
+                    border: `1px solid ${currentTheme.colors.border.default}`,
+                  }}
+                />
+              ) : (
+                <h1 className="text-4xl font-bold mb-2" style={{ color: currentTheme.colors.primary }}>
+                  {project.title}
+                </h1>
+              )}
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={editedProject.subtitle || ""}
+                  onChange={(e) =>
+                    setEditedProject({ ...editedProject, subtitle: e.target.value })
+                  }
+                  className="w-full p-2 rounded-lg"
+                  style={{
+                    backgroundColor: currentTheme.colors.background,
+                    color: currentTheme.colors.text.secondary,
+                    border: `1px solid ${currentTheme.colors.border.default}`,
+                  }}
+                />
+              ) : (
+                project.subtitle && (
+                  <p style={{ color: currentTheme.colors.text.secondary }} className="text-xl">
+                    {project.subtitle}
+                  </p>
+                )
+              )}
+            </div>
+            <div className="flex space-x-2">
+              {isEditing ? (
+                <>
+                  <button
+                    onClick={handleSave}
+                    className="px-4 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105"
+                    style={{
+                      backgroundColor: currentTheme.colors.primary,
+                      color: currentTheme.colors.background,
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="px-4 py-2 rounded-lg font-medium"
+                    style={{
+                      backgroundColor: currentTheme.colors.cardBackground,
+                      color: currentTheme.colors.text.primary,
+                      border: `1px solid ${currentTheme.colors.border.default}`,
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                    style={{
+                      backgroundColor: currentTheme.colors.primary,
+                      color: currentTheme.colors.background,
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                    style={{
+                      backgroundColor: currentTheme.colors.status.inactive.background,
+                      color: currentTheme.colors.status.inactive.text,
+                      border: `1px solid ${currentTheme.colors.border.default}`,
+                    }}
+                  >
+                    Delete
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="mb-6">
             {isEditing ? (
-              <input
-                type="text"
-                value={editedProject.title || ""}
+              <textarea
+                value={editedProject.description || ""}
                 onChange={(e) =>
-                  setEditedProject({ ...editedProject, title: e.target.value })
+                  setEditedProject({ ...editedProject, description: e.target.value })
                 }
-                className="text-3xl font-bold w-full mb-2 p-2 border rounded"
+                className="w-full h-32 p-2 rounded-lg"
+                style={{
+                  backgroundColor: currentTheme.colors.background,
+                  color: currentTheme.colors.text.primary,
+                  border: `1px solid ${currentTheme.colors.border.default}`,
+                }}
               />
             ) : (
-              <h1 className="text-3xl font-bold mb-2">{project.title}</h1>
-            )}
-            {isEditing ? (
-              <input
-                type="text"
-                value={editedProject.subtitle || ""}
-                onChange={(e) =>
-                  setEditedProject({ ...editedProject, subtitle: e.target.value })
-                }
-                className="text-xl text-gray-600 w-full p-2 border rounded"
-              />
-            ) : (
-              project.subtitle && (
-                <p className="text-xl text-gray-600">{project.subtitle}</p>
+              project.description && (
+                <p style={{ color: currentTheme.colors.text.primary }}>
+                  {project.description}
+                </p>
               )
             )}
           </div>
-          <div className="flex space-x-2">
-            {isEditing ? (
-              <>
-                <button
-                  onClick={handleSave}
-                  className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold mb-2" style={{ color: currentTheme.colors.primary }}>
+              Tags
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {project.tags.map((tag) => (
+                <span
+                  key={tag.id}
+                  className="px-3 py-1 rounded-full text-xs font-medium"
+                  style={{
+                    backgroundColor: currentTheme.colors.tag.background,
+                    color: currentTheme.colors.tag.text,
+                    boxShadow: `0 0 0 1px ${currentTheme.colors.tag.border}`,
+                  }}
                 >
-                  Save
-                </button>
-                <button
-                  onClick={() => setIsEditing(false)}
-                  className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                >
-                  Delete
-                </button>
-              </>
-            )}
+                  {tag.name}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div className="mb-6">
-          {isEditing ? (
-            <textarea
-              value={editedProject.description || ""}
-              onChange={(e) =>
-                setEditedProject({ ...editedProject, description: e.target.value })
-              }
-              className="w-full h-32 p-2 border rounded"
-            />
-          ) : (
-            project.description && (
-              <p className="text-gray-700">{project.description}</p>
-            )
-          )}
-        </div>
-
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-2">Tags</h2>
-          <div className="flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <span
-                key={tag.id}
-                className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full"
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold mb-2" style={{ color: currentTheme.colors.primary }}>
+              Sections
+            </h2>
+            {project.sections.map((section) => (
+              <div 
+                key={section.id} 
+                className="mb-4 p-4 rounded-lg"
+                style={{
+                  backgroundColor: currentTheme.colors.background,
+                  border: `1px solid ${currentTheme.colors.border.default}`,
+                }}
               >
-                {tag.name}
-              </span>
+                <h3 className="font-semibold" style={{ color: currentTheme.colors.text.primary }}>
+                  {section.title}
+                </h3>
+                <p style={{ color: currentTheme.colors.text.secondary }}>
+                  {section.content}
+                </p>
+              </div>
             ))}
           </div>
-        </div>
 
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-2">Sections</h2>
-          {project.sections.map((section) => (
-            <div key={section.id} className="mb-4 p-4 border rounded">
-              <h3 className="font-semibold">{section.title}</h3>
-              <p className="text-gray-700">{section.content}</p>
-            </div>
-          ))}
-        </div>
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold mb-2" style={{ color: currentTheme.colors.primary }}>
+              Resources
+            </h2>
+            {project.resources.map((resource) => (
+              <div key={resource.id} className="mb-2">
+                <a
+                  href={resource.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                  style={{ color: currentTheme.colors.primary }}
+                >
+                  {resource.title} ({resource.type})
+                </a>
+              </div>
+            ))}
+          </div>
 
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-2">Resources</h2>
-          {project.resources.map((resource) => (
-            <div key={resource.id} className="mb-2">
-              <a
-                href={resource.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-indigo-600 hover:text-indigo-800"
-              >
-                {resource.title} ({resource.type})
-              </a>
-            </div>
-          ))}
-        </div>
-
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Activity</h2>
-          {project.activities.map((activity) => (
-            <div key={activity.id} className="mb-2 text-sm text-gray-600">
-              {new Date(activity.createdAt).toLocaleString()}: {activity.content}
-            </div>
-          ))}
+          <div>
+            <h2 className="text-xl font-semibold mb-2" style={{ color: currentTheme.colors.primary }}>
+              Activity
+            </h2>
+            {project.activities.map((activity) => (
+              <div key={activity.id} className="mb-2 text-sm" style={{ color: currentTheme.colors.text.secondary }}>
+                {new Date(activity.createdAt).toLocaleString()}: {activity.content}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
