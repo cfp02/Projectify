@@ -1,33 +1,34 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/config';
-import SessionProvider from '@/components/SessionProvider';
-import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ThemeProvider, AuthProvider } from '@/contexts';
+import { TopBar } from '@/components/TopBar';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Projectify',
-  description: 'Track and manage your development projects',
+  description: 'Project Management and Portfolio Platform',
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
-
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SessionProvider session={session}>
+        <AuthProvider>
           <ThemeProvider>
-            {children}
+            <div>
+              <TopBar />
+              <div className="pt-16">
+                {children}
+              </div>
+            </div>
           </ThemeProvider>
-        </SessionProvider>
+        </AuthProvider>
       </body>
     </html>
   );

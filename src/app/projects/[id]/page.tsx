@@ -239,8 +239,8 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
                 </>
               ) : (
                 <>
-                  <button
-                    onClick={() => setIsEditing(true)}
+                  <Link
+                    href={`/projects/${params.id}/edit`}
                     className="px-4 py-2 rounded-lg font-medium transition-all duration-200"
                     style={{
                       backgroundColor: currentTheme.colors.primary,
@@ -248,7 +248,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
                     }}
                   >
                     Edit
-                  </button>
+                  </Link>
                   <button
                     onClick={handleDelete}
                     className="px-4 py-2 rounded-lg font-medium transition-all duration-200"
