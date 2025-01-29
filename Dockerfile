@@ -7,17 +7,20 @@ RUN apk add --no-cache \
     python3 \
     make \
     g++ \
-    git
+    git \
+    openssl \
+    openssl-dev
 
 # Install dependencies only when needed
 COPY package*.json ./
 RUN npm install
+RUN npm install -D @types/node @types/react @types/react-dom
 
 # Copy the rest of the application
 COPY . .
 
-# Build the application
-RUN npm run build
+# Generate Prisma client
+RUN npx prisma generate
 
 # Expose the port the app runs on
 EXPOSE 3000

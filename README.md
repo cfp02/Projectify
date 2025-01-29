@@ -153,39 +153,351 @@ Projectify is a comprehensive project management and portfolio platform designed
 ### Prerequisites
 - Docker and Docker Compose installed on your machine
 - Git for version control
+- Node.js and npm (for local development)
+- A code editor (VS Code, Cursor, etc.)
 
-### Development Setup
-1. Clone this repository
+### Initial Project Setup
+1. Create and navigate to project directory
    ```bash
-   git clone <repository-url>
+   mkdir projectify
    cd projectify
    ```
 
-2. Development Options:
-
-   A. Using VS Code Dev Containers (Recommended):
-   - Install the "Remote - Containers" extension in VS Code
-   - Open the project in VS Code
-   - Click "Reopen in Container" when prompted
-   - The container will build and set up the development environment automatically
-   - All necessary extensions will be installed automatically
-
-   B. Using Docker Compose directly:
+2. Initialize Git repository
    ```bash
-   docker-compose up --build
+   git init
    ```
 
-3. The application will be available at:
+3. Create the following configuration files:
+
+   a. Create `package.json`:
+   ```json
+   {
+     "name": "projectify",
+     "version": "0.1.0",
+     "private": true,
+     "scripts": {
+       "dev": "next dev",
+       "build": "next build",
+       "start": "next start",
+       "lint": "next lint",
+       "type-check": "tsc --noEmit"
+     },
+     "dependencies": {
+       "next": "14.1.3",
+       "react": "^18.2.0",
+       "react-dom": "^18.2.0",
+       "@prisma/client": "^5.10.2",
+       "next-auth": "^4.24.7",
+       "@tailwindcss/forms": "^0.5.7",
+       "@tailwindcss/typography": "^0.5.10"
+     },
+     "devDependencies": {
+       "@types/node": "^20.11.25",
+       "@types/react": "^18.2.64",
+       "@types/react-dom": "^18.2.21",
+       "autoprefixer": "^10.4.18",
+       "eslint": "^8.57.0",
+       "eslint-config-next": "14.1.3",
+       "postcss": "^8.4.35",
+       "prisma": "^5.10.2",
+       "tailwindcss": "^3.4.1",
+       "typescript": "^5.4.2"
+     }
+   }
+   ```
+
+   b. Create `Dockerfile`:
+   ```dockerfile
+   FROM node:20-alpine
+
+   WORKDIR /app
+
+   # Install dependencies for development
+   RUN apk add --no-cache \
+       python3 \
+       make \
+       g++ \
+       git
+
+   # Install dependencies only when needed
+   COPY package*.json ./
+   RUN npm install
+   RUN npm install -D @types/node @types/react @types/react-dom
+
+   # Copy the rest of the application
+   COPY . .
+
+   # Expose the port the app runs on
+   EXPOSE 3000
+
+   # Start the application
+   CMD ["npm", "run", "dev"]
+   ```
+
+   c. Create `docker-compose.yml`:
+   ```yaml
+   version: '3.8'
+
+   services:
+     web:
+       build: .
+       ports:
+         - "3000:3000"
+       volumes:
+         - .:/app
+         - /app/node_modules
+       environment:
+         - NODE_ENV=development
+       command: npm run dev
+       depends_on:
+         - db
+
+     db:
+       image: postgres:16-alpine
+       ports:
+         - "5432:5432"
+       environment:
+         POSTGRES_USER: projectify
+         POSTGRES_PASSWORD: projectify_dev
+         POSTGRES_DB: projectify_dev
+       volumes:
+         - postgres_data:/var/lib/postgresql/data
+
+   volumes:
+     postgres_data:
+   ```
+
+   d. Create `.env`:
+   ```env
+   DATABASE_URL="postgresql://projectify:projectify_dev@db:5432/projectify_dev"
+   NEXTAUTH_SECRET="development-secret-key-change-in-production"
+   NEXTAUTH_URL="http://localhost:3000"
+   ```
+
+4. Create Next.js app structure:
+   ```bash
+   mkdir -p src/app
+   ```
+
+5. Create the following files:
+
+   a. `src/app/layout.tsx`:
+   ```tsx
+   import type { Metadata } from 'next';
+   import { Inter } from 'next/font/google';
+   import './globals.css';
+
+   const inter = Inter({ subsets: ['latin'] });
+
+   export const metadata: Metadata = {
+     title: 'Projectify',
+     description: 'Project Management and Portfolio Platform',
+   };
+
+   export default function RootLayout({
+     children,
+   }: {
+     children: React.ReactNode;
+   }) {
+     return (
+       <html lang="en">
+         <body className={inter.className}>{children}</body>
+       </html>
+     );
+   }
+   ```
+
+   b. `src/app/page.tsx`:
+   ```tsx
+   import React from 'react';
+
+   export default function Home() {
+     return (
+       <main className="flex min-h-screen flex-col items-center justify-between p-24">
+         <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm">
+           <h1 className="text-4xl font-bold mb-8">Welcome to Projectify</h1>
+           <p className="text-xl mb-4">
+             Your personal project management and portfolio platform
+           </p>
+         </div>
+       </main>
+     );
+   }
+   ```
+
+   c. `src/app/globals.css`:
+   ```css
+   @tailwind base;
+   @tailwind components;
+   @tailwind utilities;
+   ```
+
+   d. `tailwind.config.ts`:
+   ```typescript
+   import type { Config } from 'tailwindcss';
+
+   const config: Config = {
+     content: [
+       './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+       './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+       './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+     ],
+     theme: {
+       extend: {},
+     },
+     plugins: [
+       require('@tailwindcss/typography'),
+       require('@tailwindcss/forms'),
+     ],
+   };
+
+   export default config;
+   ```
+
+   e. `postcss.config.js`:
+   ```javascript
+   module.exports = {
+     plugins: {
+       tailwindcss: {},
+       autoprefixer: {},
+     },
+   };
+   ```
+
+   f. `tsconfig.json`:
+   ```json
+   {
+     "compilerOptions": {
+       "target": "es5",
+       "lib": ["dom", "dom.iterable", "esnext"],
+       "allowJs": true,
+       "skipLibCheck": true,
+       "strict": true,
+       "noEmit": true,
+       "esModuleInterop": true,
+       "module": "esnext",
+       "moduleResolution": "bundler",
+       "resolveJsonModule": true,
+       "isolatedModules": true,
+       "jsx": "preserve",
+       "incremental": true,
+       "plugins": [
+         {
+           "name": "next"
+         }
+       ],
+       "paths": {
+         "@/*": ["./src/*"]
+       }
+     },
+     "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+     "exclude": ["node_modules"]
+   }
+   ```
+
+6. Install dependencies locally (for IDE support):
+   ```bash
+   npm install
+   ```
+
+7. Create Git ignore files:
+
+   a. `.gitignore`:
+   ```
+   # dependencies
+   /node_modules
+   /.pnp
+   .pnp.js
+
+   # testing
+   /coverage
+
+   # next.js
+   /.next/
+   /out/
+
+   # production
+   /build
+
+   # misc
+   .DS_Store
+   *.pem
+
+   # debug
+   npm-debug.log*
+   yarn-debug.log*
+   yarn-error.log*
+
+   # local env files
+   .env*.local
+   .env
+
+   # vercel
+   .vercel
+
+   # typescript
+   *.tsbuildinfo
+   next-env.d.ts
+
+   # IDE
+   .idea
+   .vscode
+   ```
+
+   b. `.dockerignore`:
+   ```
+   .git
+   .gitignore
+   node_modules
+   npm-debug.log
+   README.md
+   .next
+   .env
+   .env.local
+   .env.development.local
+   .env.test.local
+   .env.production.local
+   ```
+
+### Running the Application
+
+1. Start the application:
+   ```bash
+   docker-compose up
+   ```
+
+2. The application will be available at:
    - Frontend: http://localhost:3000
    - Database: localhost:5432
 
-### Environment Variables
-Create a `.env` file in the root directory with the following variables:
-```env
-DATABASE_URL="postgresql://projectify:projectify_dev@db:5432/projectify_dev"
-NEXTAUTH_SECRET="your-secret-key"
-NEXTAUTH_URL="http://localhost:3000"
-```
+3. Verify everything is working:
+   ```bash
+   # Check TypeScript
+   npm run type-check
+
+   # Check Docker containers
+   docker-compose ps
+
+   # Check database connection
+   docker-compose exec db psql -U projectify -d projectify_dev -c "\l"
+   ```
+
+4. To stop the application:
+   ```bash
+   docker-compose down
+   ```
+
+### Development Workflow
+
+1. Make changes to files in `src/` directory
+2. Changes will automatically reload in the browser
+3. Check for TypeScript errors: `npm run type-check`
+4. If you modify dependencies:
+   ```bash
+   npm install <package-name>
+   docker-compose up --build
+   ```
 
 ## Future Considerations
 - Integration with additional AI models
