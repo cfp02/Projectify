@@ -20,6 +20,11 @@ export const authOptions: AuthOptions = {
     GithubProvider({
       clientId: process.env.GITHUB_ID || "",
       clientSecret: process.env.GITHUB_SECRET || "",
+      authorization: {
+        params: {
+          scope: 'read:user user:email repo',
+        },
+      },
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_ID || "",

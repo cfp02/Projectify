@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useTheme } from '@/contexts/ThemeContext'
 import { ThemeSelector } from '@/components/ThemeSelector'
@@ -26,6 +26,10 @@ export default function ProfilePage() {
   }
 
   const { user } = session
+
+  const handleSignOut = () => {
+    signOut({ callbackUrl: '/auth/signin' });
+  };
 
   return (
     <div className="min-h-screen py-8 px-4" style={{ backgroundColor: currentTheme.colors.background }}>
@@ -103,8 +107,8 @@ export default function ProfilePage() {
               Account Settings
             </h2>
             <div className="space-y-4">
-              <Link
-                href="/api/auth/signout"
+              <button
+                onClick={handleSignOut}
                 className="inline-block px-4 py-2 rounded-lg font-medium transition-colors duration-200"
                 style={{
                   backgroundColor: currentTheme.colors.status.inactive.background,
@@ -113,7 +117,7 @@ export default function ProfilePage() {
                 }}
               >
                 Sign Out
-              </Link>
+              </button>
             </div>
           </div>
         </div>

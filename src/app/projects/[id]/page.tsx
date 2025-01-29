@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
 import { ReadmeEditor } from "@/components/ReadmeEditor";
+import GitHubRepoLink from "@/components/GitHubRepoLink";
 
 interface Tag {
   id: string;
@@ -446,6 +447,10 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
             </div>
 
             <div className="md:col-span-1">
+              <div className="mb-6">
+                <GitHubRepoLink projectId={params.id} />
+              </div>
+
               <div className="mb-6">
                 <h2 className="text-xl font-semibold mb-4" style={{ color: currentTheme.colors.primary }}>
                   Version History
