@@ -4,6 +4,8 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTheme } from "@/contexts/ThemeContext";
+import { ThemeSelector } from "@/components/ThemeSelector";
 
 interface Project {
   id: string;
@@ -15,6 +17,7 @@ interface Project {
 }
 
 export default function ProjectsPage() {
+  const { currentTheme } = useTheme();
   const { data: session, status } = useSession();
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
@@ -72,16 +75,20 @@ export default function ProjectsPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-[#1a1b26] text-emerald-400">
-        <div className="animate-pulse">Loading...</div>
+      <div className="flex justify-center items-center min-h-screen" style={{ backgroundColor: currentTheme.colors.background }}>
+        <div className="animate-pulse" style={{ color: currentTheme.colors.primary }}>Loading...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-[#1a1b26]">
-        <div className="text-orange-500 bg-orange-950/30 px-4 py-2 rounded-md border border-orange-800/50">
+      <div className="flex justify-center items-center min-h-screen" style={{ backgroundColor: currentTheme.colors.background }}>
+        <div className="px-4 py-2 rounded-md border" style={{
+          color: currentTheme.colors.status.inactive.text,
+          backgroundColor: currentTheme.colors.status.inactive.background,
+          borderColor: currentTheme.colors.border.default,
+        }}>
           Error: {error}
         </div>
       </div>
@@ -89,23 +96,31 @@ export default function ProjectsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1a1b26] text-gray-100 py-8 px-4">
+    <div className="min-h-screen py-8 px-4" style={{ backgroundColor: currentTheme.colors.background }}>
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-12">
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+            <h1 className={`text-4xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${currentTheme.gradients.heading}`}>
               My Projects
             </h1>
-            <p className="text-gray-400 mt-2">Manage and track your development projects</p>
+            <p style={{ color: currentTheme.colors.text.secondary }}>
+              Manage and track your development projects
+            </p>
           </div>
-          <button
-            onClick={createProject}
-            className="bg-emerald-500 hover:bg-emerald-400 text-gray-900 px-6 py-3 rounded-lg 
-                     font-medium transition-all duration-200 transform hover:scale-105 
-                     hover:shadow-[0_0_15px_rgba(52,211,153,0.3)] active:scale-95"
-          >
-            + New Project
-          </button>
+          <div className="flex items-center gap-4">
+            <ThemeSelector />
+            <button
+              onClick={createProject}
+              className="px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95"
+              style={{
+                backgroundColor: currentTheme.colors.primary,
+                color: currentTheme.colors.background,
+                boxShadow: currentTheme.shadows.button.replace(/_/g, ' '),
+              }}
+            >
+              + New Project
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -113,43 +128,61 @@ export default function ProjectsPage() {
             <Link
               key={project.id}
               href={`/projects/${project.id}`}
-              className="group block rounded-xl bg-[#24273a] p-6 
-                       transition-all duration-300 hover:shadow-[0_0_25px_rgba(52,211,153,0.1)]
-                       border border-gray-800/50 hover:border-emerald-500/30
-                       relative overflow-hidden"
+              className="group block rounded-xl p-6 transition-all duration-300 relative overflow-hidden"
+              style={{
+                backgroundColor: currentTheme.colors.cardBackground,
+                borderColor: currentTheme.colors.border.default,
+                boxShadow: `0 0 0 1px ${currentTheme.colors.border.default}`,
+              }}
             >
               <div className="relative z-10">
                 <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-xl font-bold text-emerald-400 group-hover:text-emerald-300">
+                  <h2 className="text-xl font-bold" style={{ color: currentTheme.colors.primary }}>
                     {project.title}
                   </h2>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium
-                    ${project.status === 'active' 
-                      ? 'bg-emerald-400/10 text-emerald-400' 
-                      : 'bg-gray-700/50 text-gray-400'}`}>
+                  <span className="px-2 py-1 rounded-full text-xs font-medium" style={{
+                    color: project.status === 'active' 
+                      ? currentTheme.colors.status.active.text 
+                      : currentTheme.colors.status.inactive.text,
+                    backgroundColor: project.status === 'active'
+                      ? currentTheme.colors.status.active.background
+                      : currentTheme.colors.status.inactive.background,
+                  }}>
                     {project.status}
                   </span>
                 </div>
                 {project.subtitle && (
-                  <p className="text-gray-400 mb-2 font-medium">{project.subtitle}</p>
+                  <p style={{ color: currentTheme.colors.text.secondary }} className="mb-2 font-medium">
+                    {project.subtitle}
+                  </p>
                 )}
                 {project.description && (
-                  <p className="text-gray-500 mb-4 line-clamp-2">{project.description}</p>
+                  <p style={{ color: currentTheme.colors.text.muted }} className="mb-4 line-clamp-2">
+                    {project.description}
+                  </p>
                 )}
                 <div className="flex flex-wrap gap-2 mt-4">
                   {project.tags.map((tag) => (
                     <span
                       key={tag.id}
-                      className="px-3 py-1 rounded-full text-xs font-medium
-                               bg-[#1a1b26] text-cyan-400 border border-cyan-950"
+                      className="px-3 py-1 rounded-full text-xs font-medium"
+                      style={{
+                        backgroundColor: currentTheme.colors.tag.background,
+                        color: currentTheme.colors.tag.text,
+                        boxShadow: `0 0 0 1px ${currentTheme.colors.tag.border}`,
+                      }}
                     >
                       {tag.name}
                     </span>
                   ))}
                 </div>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/3 to-cyan-500/3 
-                            opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{
+                  background: `linear-gradient(to right, ${currentTheme.colors.primary}05, ${currentTheme.colors.secondary}05)`,
+                }}
+              />
             </Link>
           ))}
         </div>
