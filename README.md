@@ -4,6 +4,9 @@
 Projectify is a comprehensive project management and portfolio platform designed to help developers track, document, and showcase their projects. It features voice input capabilities, AI-powered project analysis, and seamless project state tracking to help developers easily resume work on projects after breaks.
 
 ## 🚨 Progress Tracking Instructions
+<details>
+<summary>Click to expand progress tracking guidelines</summary>
+
 **IMPORTANT**: This README serves as a living document of project progress. To maintain its effectiveness:
 1. Update this document with EVERY meaningful change or work session
 2. Add entries in the Progress Log section below with:
@@ -14,6 +17,7 @@ Projectify is a comprehensive project management and portfolio platform designed
 3. Mark completed items in the project phases with ✅
 4. Update the "Current Focus" section
 5. Add any new requirements or ideas to the "Future Considerations" section
+</details>
 
 ## Current Focus
 - [✅] Phase 1: Core Web Application Foundation
@@ -23,7 +27,10 @@ Projectify is a comprehensive project management and portfolio platform designed
   - [ ] Project CRUD operations (Next)
 
 ## Progress Log
-### 2024-03-28 (Latest)
+<details>
+<summary>View complete progress history</summary>
+
+### 2025-01-29 (Latest)
 - Phase: Phase 1 - Core Web Application Foundation
 - Work completed:
   - Implemented comprehensive layout system with TopBar and ProjectSidebar
@@ -41,7 +48,7 @@ Projectify is a comprehensive project management and portfolio platform designed
   - Improved theme consistency across components
   - Successfully integrated client-side navigation with auth protection
 
-### 2024-03-27
+### 2025-01-28
 - Phase: Phase 1 - Core Web Application Foundation
 - Work completed:
   - Implemented Project creation form with theme-aware styling
@@ -58,7 +65,7 @@ Projectify is a comprehensive project management and portfolio platform designed
   - Improved form field contrast for better readability
   - Successfully integrated client-side form validation
 
-### 2024-03-26
+### 2025-01-27
 - Phase: Phase 1 - Core Web Application Foundation
 - Work completed:
   - Set up complete development environment with Docker
@@ -74,6 +81,11 @@ Projectify is a comprehensive project management and portfolio platform designed
   - Authentication system is ready for testing with GitHub and Google
   - Database schema includes all core models: User, Project, Section, Resource, Tag, Activity
   - Docker environment is fully configured for development
+</details>
+
+## Development Guide
+<details>
+<summary>Quick Start Guide</summary>
 
 ### Quick Start (After Initial Setup)
 If you've already set up the project and are returning to development:
@@ -114,6 +126,11 @@ If you've already set up the project and are returning to development:
    - If you see "Port 3000 is in use": Make sure to stop any local development servers
    - If changes aren't appearing: Ensure you've rebuilt the containers with `docker compose up --build`
    - If database issues occur: Check if the database container is running with `docker compose ps`
+</details>
+
+## Project Status & Features
+<details>
+<summary>Current Status</summary>
 
 ### Project Status
 - ✅ Development environment
@@ -127,6 +144,10 @@ If you've already set up the project and are returning to development:
 - ✅ User profile and preferences
 - 🚧 Project section management (In Progress)
 - 🚧 Resource management (In Progress)
+</details>
+
+<details>
+<summary>Feature Details</summary>
 
 ### Features
 1. **Authentication**
@@ -202,10 +223,11 @@ If you've already set up the project and are returning to development:
      - Proper contrast ratios
      - Hover and active states
      - Status indicators
+</details>
 
-## Testing Setup
-
-The project uses Jest and React Testing Library for testing. The setup includes:
+## Technical Documentation
+<details>
+<summary>Testing Setup</summary>
 
 ### Test Dependencies
 ```json
@@ -246,10 +268,10 @@ describe('YourComponent', () => {
   })
 })
 ```
+</details>
 
-## CI/CD Pipeline
-
-Our CI/CD pipeline automates testing, building, and deployment:
+<details>
+<summary>CI/CD Pipeline</summary>
 
 ### Continuous Integration (CI)
 On every push and pull request to `main`:
@@ -280,8 +302,11 @@ Version format: `vMAJOR.MINOR.PATCH`
 - MAJOR: Breaking changes
 - MINOR: New features
 - PATCH: Bug fixes
+</details>
 
-## Project Phases
+## Project Roadmap
+<details>
+<summary>View complete project phases</summary>
 
 ### Phase 1: Core Web Application Foundation
 1. Basic Setup
@@ -379,8 +404,11 @@ Version format: `vMAJOR.MINOR.PATCH`
    - [ ] Version control
    - [ ] Role management
    - [ ] Activity feed
+</details>
 
-## Getting Started
+## Setup & Configuration
+<details>
+<summary>Complete setup instructions</summary>
 
 ### Prerequisites
 - Docker and Docker Compose installed on your machine
@@ -691,9 +719,12 @@ Version format: `vMAJOR.MINOR.PATCH`
    .env.test.local
    .env.production.local
    ```
+</details>
+
+<details>
+<summary>Running the Application</summary>
 
 ### Running the Application
-
 1. Start the application:
    ```bash
    docker-compose up
@@ -721,7 +752,6 @@ Version format: `vMAJOR.MINOR.PATCH`
    ```
 
 ### Development Workflow
-
 1. Make changes to files in `src/` directory
 2. Changes will automatically reload in the browser
 3. Check for TypeScript errors: `npm run type-check`
@@ -730,12 +760,17 @@ Version format: `vMAJOR.MINOR.PATCH`
    npm install <package-name>
    docker-compose up --build
    ```
+</details>
 
 ## Future Considerations
+<details>
+<summary>View future plans and considerations</summary>
+
 - Integration with additional AI models
 - Enhanced mobile capabilities
 - Additional hardware companion devices
 - Extended portfolio features
+</details>
 
 ## Contributing
 This is currently a personal project, but structured to maintain high code quality and documentation standards.
