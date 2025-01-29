@@ -111,49 +111,83 @@ If you've already set up the project and are returning to development:
    - Resource management
    - Section organization
 
-### CI/CD Pipeline
+## Testing Setup
 
-The project uses GitHub Actions for automated testing and deployment:
+The project uses Jest and React Testing Library for testing. The setup includes:
 
-1. **Continuous Integration (CI)**
-   - Runs on every push and pull request to `main`
-   - Automated checks:
-     - TypeScript type checking
-     - ESLint code linting
-     - Database migrations
-     - (Future) Unit and integration tests
+### Test Dependencies
+```json
+{
+  "@testing-library/jest-dom": "^6.4.2",
+  "@testing-library/react": "^14.2.1",
+  "@types/jest": "^29.5.12",
+  "jest": "^29.7.0",
+  "jest-environment-jsdom": "^29.7.0"
+}
+```
 
-2. **Continuous Deployment (CD)**
-   - Triggers on version tags (e.g., v1.0.0)
-   - Automated process:
-     - Builds the application
-     - Runs all tests
-     - Deploys to production
-     - Manages environment variables
+### Configuration Files
+- `jest.config.mjs`: Configures Jest with Next.js
+- `tsconfig.test.json`: TypeScript configuration for test files
+- `jest.setup.js`: Sets up testing environment
 
-3. **Release Process**
-   Each project phase corresponds to a major version:
-   - Phase 1 (v1.x.x): Core Web Application
-   - Phase 2 (v2.x.x): Input Methods & Content
-   - Phase 3 (v3.x.x): AI Integration
-   - Phase 4 (v4.x.x): Portfolio Generation
-   - Phase 5 (v5.x.x): Browser Integration
-   - Phase 6 (v6.x.x): External Device Integration
-   - Phase 7 (v7.x.x): Advanced Features
+### Running Tests
+```bash
+# Run tests once
+npm test
 
-   Version format: `vMAJOR.MINOR.PATCH`
-   - MAJOR: Breaking changes (new phases)
-   - MINOR: New features
-   - PATCH: Bug fixes and small improvements
+# Run tests in watch mode
+npm run test:watch
+```
 
-4. **Creating a Release**
-   ```bash
-   # Tag a new version
-   git tag -a v1.0.0 -m "Phase 1: Core Web Application"
-   
-   # Push the tag to trigger deployment
-   git push origin v1.0.0
-   ```
+### Writing Tests
+Tests are co-located with their components using the `.test.tsx` extension. Example:
+```typescript
+import '@testing-library/jest-dom'
+import { render, screen } from '@testing-library/react'
+import { YourComponent } from './YourComponent'
+
+describe('YourComponent', () => {
+  it('renders expected content', () => {
+    render(<YourComponent />)
+    expect(screen.getByText('Expected Text')).toBeInTheDocument()
+  })
+})
+```
+
+## CI/CD Pipeline
+
+Our CI/CD pipeline automates testing, building, and deployment:
+
+### Continuous Integration (CI)
+On every push and pull request to `main`:
+1. Installs dependencies
+2. Runs TypeScript type checking
+3. Runs ESLint
+4. Executes Jest tests
+5. Builds the application
+
+### Continuous Deployment (CD)
+On version tags (e.g., `v1.0.0`):
+1. Runs all CI checks
+2. Builds Docker container
+3. Deploys to production (if all checks pass)
+
+### Release Process
+1. Create a new version tag:
+```bash
+git tag -a v1.0.0 -m "Release version 1.0.0"
+git push origin v1.0.0
+```
+
+2. The CD pipeline will automatically:
+   - Build and test the application
+   - Deploy to production if all checks pass
+
+Version format: `vMAJOR.MINOR.PATCH`
+- MAJOR: Breaking changes
+- MINOR: New features
+- PATCH: Bug fixes
 
 ## Project Phases
 
