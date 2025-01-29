@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
+import { ReadmeEditor } from "@/components/ReadmeEditor";
 
 interface Tag {
   id: string;
@@ -32,6 +33,17 @@ interface Activity {
   createdAt: string;
 }
 
+interface ProjectVersion {
+  id: string;
+  version: number;
+  title: string;
+  subtitle?: string;
+  description?: string;
+  status: string;
+  createdAt: string;
+  reason?: string;
+}
+
 interface Project {
   id: string;
   title: string;
@@ -49,10 +61,14 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
+  const [versions, setVersions] = useState<ProjectVersion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedProject, setEditedProject] = useState<Partial<Project>>({});
+  const [creatingVersion, setCreatingVersion] = useState(false);
+  const [versionReason, setVersionReason] = useState("");
+  const [restoringVersion, setRestoringVersion] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -63,6 +79,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     if (session) {
       fetchProject();
+      fetchVersions();
     }
   }, [session, params.id]);
 
@@ -77,6 +94,66 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchVersions = async () => {
+    try {
+      const response = await fetch(`/api/projects/${params.id}/versions`);
+      if (!response.ok) throw new Error("Failed to fetch versions");
+      const data = await response.json();
+      setVersions(data);
+    } catch (err) {
+      console.error("Error fetching versions:", err);
+    }
+  };
+
+  const createVersion = async () => {
+    if (!versionReason.trim()) return;
+    
+    setCreatingVersion(true);
+    try {
+      const response = await fetch(`/api/projects/${params.id}/versions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ reason: versionReason }),
+      });
+
+      if (!response.ok) throw new Error("Failed to create version");
+      
+      const newVersion = await response.json();
+      setVersions([newVersion, ...versions]);
+      setVersionReason("");
+      // Refresh project data to get updated activities
+      fetchProject();
+    } catch (err) {
+      console.error("Error creating version:", err);
+    } finally {
+      setCreatingVersion(false);
+    }
+  };
+
+  const restoreVersion = async (versionId: string) => {
+    if (!confirm("Are you sure you want to restore this version? Current project state will be overwritten.")) {
+      return;
+    }
+
+    setRestoringVersion(true);
+    try {
+      const response = await fetch(`/api/projects/${params.id}/versions/restore/${versionId}`, {
+        method: "PUT",
+      });
+
+      if (!response.ok) throw new Error("Failed to restore version");
+      
+      // Refresh project data and versions
+      await Promise.all([fetchProject(), fetchVersions()]);
+    } catch (err) {
+      console.error("Error restoring version:", err);
+    } finally {
+      setRestoringVersion(false);
     }
   };
 
@@ -358,6 +435,89 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
                 {new Date(activity.createdAt).toLocaleString()}: {activity.content}
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="md:col-span-2">
+              <ReadmeEditor projectId={params.id} />
+              {/* ... existing sections, resources, etc. ... */}
+            </div>
+
+            <div className="md:col-span-1">
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold mb-4" style={{ color: currentTheme.colors.primary }}>
+                  Version History
+                </h2>
+                
+                <div className="mb-4">
+                  <textarea
+                    value={versionReason}
+                    onChange={(e) => setVersionReason(e.target.value)}
+                    placeholder="Enter a reason for creating a new version..."
+                    className="w-full p-2 rounded-md text-sm"
+                    style={{
+                      backgroundColor: currentTheme.colors.cardBackground,
+                      color: currentTheme.colors.text.primary,
+                      borderColor: currentTheme.colors.border.default,
+                    }}
+                    rows={2}
+                  />
+                  <button
+                    onClick={createVersion}
+                    disabled={creatingVersion || !versionReason.trim()}
+                    className="mt-2 px-4 py-2 rounded-md text-sm font-medium w-full transition-colors duration-200"
+                    style={{
+                      backgroundColor: currentTheme.colors.primary,
+                      color: currentTheme.colors.text.primary,
+                      opacity: creatingVersion || !versionReason.trim() ? 0.7 : 1,
+                    }}
+                  >
+                    {creatingVersion ? "Creating..." : "Create Version"}
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {versions.map((version) => (
+                    <div
+                      key={version.id}
+                      className="p-3 rounded-md border"
+                      style={{
+                        backgroundColor: currentTheme.colors.cardBackground,
+                        borderColor: currentTheme.colors.border.default,
+                      }}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="font-medium" style={{ color: currentTheme.colors.text.primary }}>
+                          Version {version.version}
+                        </span>
+                        <span className="text-xs" style={{ color: currentTheme.colors.text.secondary }}>
+                          {new Date(version.createdAt).toLocaleString()}
+                        </span>
+                      </div>
+                      {version.reason && (
+                        <p className="text-sm mb-2" style={{ color: currentTheme.colors.text.secondary }}>
+                          {version.reason}
+                        </p>
+                      )}
+                      <button
+                        onClick={() => restoreVersion(version.id)}
+                        disabled={restoringVersion}
+                        className="text-xs px-3 py-1 rounded-md transition-colors duration-200"
+                        style={{
+                          backgroundColor: currentTheme.colors.secondary,
+                          color: currentTheme.colors.text.primary,
+                          opacity: restoringVersion ? 0.7 : 1,
+                        }}
+                      >
+                        {restoringVersion ? "Restoring..." : "Restore"}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

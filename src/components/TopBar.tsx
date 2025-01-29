@@ -1,7 +1,6 @@
 'use client'
 
 import { useTheme } from '@/contexts/ThemeContext'
-import { ThemeSelector } from './ThemeSelector'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -39,7 +38,6 @@ export function TopBar() {
         </div>
         
         <div className="flex items-center gap-4">
-          <ThemeSelector />
           {session?.user && (
             <Link
               href="/profile"

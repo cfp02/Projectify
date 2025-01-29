@@ -65,6 +65,11 @@ model Project {
   resources   Resource[]
   tags        Tag[]
   activities  Activity[]
+  versions    ProjectVersion[]
+  readme      Readme?
+  githubRepo  GithubRepo?
+
+  @@index([userId])
 }
 
 model Section {
@@ -103,4 +108,60 @@ model Activity {
   projectId String
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+}
+
+model ProjectVersion {
+  id          String   @id @default(cuid())
+  version     Int
+  title       String
+  subtitle    String?
+  description String?  @db.Text
+  status      String
+  snapshot    Json     // Stores the complete project state including sections, resources, etc.
+  createdAt   DateTime @default(now())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId      String   // Store who created this version
+  reason      String?  @db.Text // Optional reason for the version (e.g., "Added new feature", "Updated documentation")
+
+  @@unique([projectId, version]) // Ensure version numbers are unique per project
+}
+
+model Readme {
+  id          String          @id @default(cuid())
+  content     String          @db.Text
+  projectId   String          @unique // One-to-one with Project
+  project     Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  versions    ReadmeVersion[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  isTemplate  Boolean         @default(false) // Whether this README is used as a template
+
+  @@index([projectId])
+}
+
+model ReadmeVersion {
+  id        String   @id @default(cuid())
+  version   Int
+  content   String   @db.Text
+  message   String?  @db.Text // Commit message for the version
+  readmeId  String
+  readme    Readme   @relation(fields: [readmeId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([readmeId])
+  @@index([version])
+}
+
+model GithubRepo {
+  id            String   @id @default(cuid())
+  repoUrl       String
+  repoName      String
+  ownerName     String
+  projectId     String   @unique // One-to-one with Project
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  lastSynced    DateTime @default(now())
+  syncEnabled   Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 } 

@@ -1,7 +1,7 @@
 # Projectify
 
 ## Project Overview
-Projectify is a comprehensive project management and portfolio platform designed to help developers track, document, and showcase their projects. It features voice input capabilities, AI-powered project analysis, and seamless project state tracking to help developers easily resume work on projects after breaks.
+Projectify is a comprehensive project management and portfolio platform designed to help developers track, document, and showcase their projects. It features voice input capabilities, AI-powered project analysis, and seamless project state tracking to help developers easily resume work on projects after breaks. The platform centers around project READMEs as living documents, whether from GitHub repositories or stored locally, while maintaining flexibility in format and structure.
 
 ## 🚨 Progress Tracking Instructions
 <details>
@@ -17,6 +17,54 @@ Projectify is a comprehensive project management and portfolio platform designed
 3. Mark completed items in the project phases with ✅
 4. Update the "Current Focus" section
 5. Add any new requirements or ideas to the "Future Considerations" section
+
+### README Template Structure
+Each project README should maintain this structure to ensure Cursor compatibility and consistent project management:
+
+```markdown
+# Project Name
+
+## 🚨 Project Management Instructions
+<details>
+<summary>Click to expand project management guidelines</summary>
+
+**IMPORTANT**: This README is a living document managed by Projectify and Cursor.
+To maintain compatibility and effectiveness:
+1. Do not modify the structure of special sections (marked with 🚨)
+2. Keep all Cursor-specific metadata intact
+3. Update the Progress Log with every significant change
+4. Use the provided section templates for new content
+5. Maintain the established heading hierarchy
+</details>
+
+## Current Focus
+- [ ] Current phase/milestone
+- [ ] Active tasks/features
+- [ ] Immediate next steps
+
+## Progress Log
+<details>
+<summary>View complete progress history</summary>
+
+### YYYY-MM-DD (Latest)
+- Phase: [Current Phase]
+- Work completed:
+  - [List of completed items]
+- Next steps:
+  - [List of next steps]
+- Notes/Challenges:
+  - [Any notable points]
+</details>
+
+[... Rest of project-specific content ...]
+```
+
+This structure ensures:
+- Cursor can properly parse and manage the document
+- Project history is consistently tracked
+- Progress is visible and well-documented
+- Templates can be automatically generated
+- GitHub integration remains smooth
 </details>
 
 ## Current Focus
@@ -33,22 +81,21 @@ Projectify is a comprehensive project management and portfolio platform designed
 ### 2025-01-29 (Latest)
 - Phase: Phase 1 - Core Web Application Foundation
 - Work completed:
-  - Implemented comprehensive layout system with TopBar and ProjectSidebar
-  - Created dedicated profile page with user settings and preferences
-  - Enhanced navigation with proper routing and auth checks
-  - Improved theme management accessibility
-  - Added project navigation in sidebar
-  - Fixed image loading for auth provider avatars
+  - Implemented project version tracking system
+  - Added version history UI to project detail page
+  - Created version restore functionality
+  - Improved UI organization by moving theme selector to profile page
+  - Added database migration for project versions
 - Next steps:
-  - Add notification preferences to profile
   - Implement project section management
   - Add resource upload capabilities
+  - Enhance version comparison features
 - Notes/Challenges:
-  - Resolved Next.js image configuration for auth provider avatars
-  - Improved theme consistency across components
-  - Successfully integrated client-side navigation with auth protection
+  - Successfully implemented database transactions for version restoration
+  - Added activity tracking for version-related actions
+  - Improved UI organization by centralizing theme management in profile
 
-### 2025-01-28
+### 2025-01-28 (Evening)
 - Phase: Phase 1 - Core Web Application Foundation
 - Work completed:
   - Implemented Project creation form with theme-aware styling
@@ -65,7 +112,7 @@ Projectify is a comprehensive project management and portfolio platform designed
   - Improved form field contrast for better readability
   - Successfully integrated client-side form validation
 
-### 2025-01-27
+### 2025-01-28 (Morning)
 - Phase: Phase 1 - Core Web Application Foundation
 - Work completed:
   - Set up complete development environment with Docker
@@ -202,7 +249,7 @@ If you've already set up the project and are returning to development:
    - Dedicated profile page with:
      - User information display
      - Avatar from auth provider
-     - Theme preference management
+     - Centralized theme preference management
      - Account settings
    - Quick access from top bar
    - Protected routes with auth checks
@@ -215,7 +262,7 @@ If you've already set up the project and are returning to development:
      - Cyberpunk (Vibrant pink/cyan theme)
      - Emerald Sea (Modern green/cyan theme)
    - Theme management:
-     - Centralized in profile settings
+     - Centralized in profile settings only
      - Real-time preview
      - Persistent across sessions
    - Consistent styling:
@@ -223,6 +270,59 @@ If you've already set up the project and are returning to development:
      - Proper contrast ratios
      - Hover and active states
      - Status indicators
+
+7. **Version Control System**
+   - Project version tracking:
+     - Create snapshots with descriptions
+     - View version history
+     - Restore previous versions
+   - Activity tracking:
+     - Version creation events
+     - Version restoration events
+   - Complete state preservation:
+     - Project metadata
+     - Sections and resources
+     - Tags and status
+   - User-friendly interface:
+     - Version timeline view
+     - Restore confirmation
+     - Version descriptions
+
+8. **Project section management**
+   - Add functionality to manage project sections
+   - Implement section creation, editing, and deletion
+   - Ensure sections are linked to projects
+
+9. **Resource management**
+   - Add functionality to manage project resources
+   - Implement resource upload, editing, and deletion
+   - Ensure resources are linked to projects and sections
+
+10. **README-Centric Project Management**
+    - Core project documentation:
+      - Dedicated README display and editing section
+      - Support for both GitHub-synced and local READMEs
+      - Format-agnostic approach for flexibility
+      - Cursor-compatible structure
+    - Standardized Template:
+      - Required sections for Cursor compatibility
+      - Project management metadata
+      - Progress tracking structure
+      - Special section markers
+    - Integration features:
+      - Two-way GitHub README sync
+      - Repository creation with README template
+      - Project import with README parsing
+    - Auxiliary information:
+      - Project tags and categorization
+      - Subtitle and quick description
+      - Status and progress tracking
+      - Resource linking
+    - Development workflow:
+      - Cursor-compatible README editing
+      - Local development support
+      - GitHub integration optional but supported
+      - Version control for README changes
 </details>
 
 ## Technical Documentation
@@ -310,16 +410,27 @@ Version format: `vMAJOR.MINOR.PATCH`
 
 ### Phase 1: Core Web Application Foundation
 1. Basic Setup
-   - [ ] React/Next.js frontend
-   - [ ] Backend (Node.js/Express or FastAPI)
-   - [ ] Database setup (PostgreSQL for structured data, MongoDB for unstructured data)
-   - [ ] User authentication system
-   - [ ] Basic project CRUD operations
+   - [✅] React/Next.js frontend
+   - [✅] Database setup (PostgreSQL)
+   - [✅] User authentication system
+   - [✅] Basic project CRUD operations
 
 2. Project Data Structure Implementation
-   - [ ] Project model with core fields
-   - [ ] Project versioning system
-   - [ ] Project state tracking
+   - [✅] Project model with core fields
+   - [✅] Project versioning system
+   - [ ] README-centric project management:
+     - Large, dedicated README section in project view
+     - Support for both GitHub-synced and local READMEs
+     - Format-agnostic README display and editing
+     - Cursor-compatible README structure
+     - Auxiliary project metadata (tags, subtitle, etc.)
+
+3. Project-GitHub Integration
+   - [ ] GitHub repository linking
+   - [ ] Two-way README synchronization
+   - [ ] Repository creation from Projectify
+   - [ ] Project import from existing repositories
+   - [ ] Maintain Cursor compatibility for READMEs
 
 ### Phase 2: Input Methods & Content Management
 1. Text Input System
@@ -404,6 +515,35 @@ Version format: `vMAJOR.MINOR.PATCH`
    - [ ] Version control
    - [ ] Role management
    - [ ] Activity feed
+
+### Phase 8: GitHub Integration & Project Templates
+1. Repository Management
+   - [ ] GitHub OAuth integration for repository access
+   - [ ] Repository creation from Projectify
+   - [ ] README.md template system
+   - [ ] Two-way sync for project updates
+   - [ ] Branch and commit management
+
+2. Template System
+   - [ ] Canonical README structure definition
+   - [ ] Project phase templates
+   - [ ] Progress tracking templates
+   - [ ] Development workflow templates
+   - [ ] Cursor-compatible documentation format
+
+3. Automation Features
+   - [ ] Automated repository setup
+   - [ ] README generation with project structure
+   - [ ] Development environment configuration
+   - [ ] CI/CD template generation
+   - [ ] Project board integration
+
+4. Integration Features
+   - [ ] GitHub issue tracking
+   - [ ] Pull request management
+   - [ ] Commit history visualization
+   - [ ] Branch strategy templates
+   - [ ] GitHub Actions integration
 </details>
 
 ## Setup & Configuration
@@ -587,193 +727,4 @@ Version format: `vMAJOR.MINOR.PATCH`
    ```
 
    c. `src/app/globals.css`:
-   ```css
-   @tailwind base;
-   @tailwind components;
-   @tailwind utilities;
    ```
-
-   d. `tailwind.config.ts`:
-   ```typescript
-   import type { Config } from 'tailwindcss';
-
-   const config: Config = {
-     content: [
-       './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-       './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-       './src/app/**/*.{js,ts,jsx,tsx,mdx}',
-     ],
-     theme: {
-       extend: {},
-     },
-     plugins: [
-       require('@tailwindcss/typography'),
-       require('@tailwindcss/forms'),
-     ],
-   };
-
-   export default config;
-   ```
-
-   e. `postcss.config.js`:
-   ```javascript
-   module.exports = {
-     plugins: {
-       tailwindcss: {},
-       autoprefixer: {},
-     },
-   };
-   ```
-
-   f. `tsconfig.json`:
-   ```json
-   {
-     "compilerOptions": {
-       "target": "es5",
-       "lib": ["dom", "dom.iterable", "esnext"],
-       "allowJs": true,
-       "skipLibCheck": true,
-       "strict": true,
-       "noEmit": true,
-       "esModuleInterop": true,
-       "module": "esnext",
-       "moduleResolution": "bundler",
-       "resolveJsonModule": true,
-       "isolatedModules": true,
-       "jsx": "preserve",
-       "incremental": true,
-       "plugins": [
-         {
-           "name": "next"
-         }
-       ],
-       "paths": {
-         "@/*": ["./src/*"]
-       }
-     },
-     "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-     "exclude": ["node_modules"]
-   }
-   ```
-
-6. Install dependencies locally (for IDE support):
-   ```bash
-   npm install
-   ```
-
-7. Create Git ignore files:
-
-   a. `.gitignore`:
-   ```
-   # dependencies
-   /node_modules
-   /.pnp
-   .pnp.js
-
-   # testing
-   /coverage
-
-   # next.js
-   /.next/
-   /out/
-
-   # production
-   /build
-
-   # misc
-   .DS_Store
-   *.pem
-
-   # debug
-   npm-debug.log*
-   yarn-debug.log*
-   yarn-error.log*
-
-   # local env files
-   .env*.local
-   .env
-
-   # vercel
-   .vercel
-
-   # typescript
-   *.tsbuildinfo
-   next-env.d.ts
-
-   # IDE
-   .idea
-   .vscode
-   ```
-
-   b. `.dockerignore`:
-   ```
-   .git
-   .gitignore
-   node_modules
-   npm-debug.log
-   README.md
-   .next
-   .env
-   .env.local
-   .env.development.local
-   .env.test.local
-   .env.production.local
-   ```
-</details>
-
-<details>
-<summary>Running the Application</summary>
-
-### Running the Application
-1. Start the application:
-   ```bash
-   docker-compose up
-   ```
-
-2. The application will be available at:
-   - Frontend: http://localhost:3000
-   - Database: localhost:5432
-
-3. Verify everything is working:
-   ```bash
-   # Check TypeScript
-   npm run type-check
-
-   # Check Docker containers
-   docker-compose ps
-
-   # Check database connection
-   docker-compose exec db psql -U projectify -d projectify_dev -c "\l"
-   ```
-
-4. To stop the application:
-   ```bash
-   docker-compose down
-   ```
-
-### Development Workflow
-1. Make changes to files in `src/` directory
-2. Changes will automatically reload in the browser
-3. Check for TypeScript errors: `npm run type-check`
-4. If you modify dependencies:
-   ```bash
-   npm install <package-name>
-   docker-compose up --build
-   ```
-</details>
-
-## Future Considerations
-<details>
-<summary>View future plans and considerations</summary>
-
-- Integration with additional AI models
-- Enhanced mobile capabilities
-- Additional hardware companion devices
-- Extended portfolio features
-</details>
-
-## Contributing
-This is currently a personal project, but structured to maintain high code quality and documentation standards.
-
-## License
-[License details to be determined] 
