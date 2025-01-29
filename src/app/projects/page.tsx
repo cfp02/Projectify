@@ -109,8 +109,8 @@ export default function ProjectsPage() {
           </div>
           <div className="flex items-center gap-4">
             <ThemeSelector />
-            <button
-              onClick={createProject}
+            <Link
+              href="/projects/new"
               className="px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95"
               style={{
                 backgroundColor: currentTheme.colors.primary,
@@ -119,7 +119,7 @@ export default function ProjectsPage() {
               }}
             >
               + New Project
-            </button>
+            </Link>
           </div>
         </div>
 
