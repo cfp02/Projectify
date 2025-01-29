@@ -45,23 +45,40 @@ If you've already set up the project and are returning to development:
 
 1. Start the containers:
    ```bash
-   docker-compose up
+   docker compose up
    ```
 
 2. Verify services are running:
    ```bash
-   docker-compose ps
+   docker compose ps
    ```
 
 3. Access the application:
    - Frontend: http://localhost:3000
    - Try signing in with GitHub or Google
 
-4. If you need to rebuild (after dependency changes):
+4. If you need to rebuild (after dependency changes or code updates):
    ```bash
-   docker-compose down
-   docker-compose up --build
+   docker compose down
+   docker compose up --build
    ```
+
+### ⚠️ Important Development Workflow
+**ALWAYS USE DOCKER FOR DEVELOPMENT**
+1. The application is containerized and should ALWAYS be run using Docker Compose
+2. Do NOT run `npm run dev` locally, as this may conflict with the Docker container
+3. After making code changes:
+   ```bash
+   # Stop all containers
+   docker compose down
+
+   # Rebuild and start containers with new changes
+   docker compose up --build
+   ```
+4. Common issues and solutions:
+   - If you see "Port 3000 is in use": Make sure to stop any local development servers
+   - If changes aren't appearing: Ensure you've rebuilt the containers with `docker compose up --build`
+   - If database issues occur: Check if the database container is running with `docker compose ps`
 
 ### Project Status
 - ✅ Development environment
