@@ -84,8 +84,8 @@ If you've already set up the project and are returning to development:
 - ✅ Development environment
 - ✅ Database schema
 - ✅ Authentication system
-- ✅ Basic UI structure
 - ✅ Theme system with multiple themes
+- ✅ CI/CD Pipeline
 - 🚧 Project management features (In Progress)
 
 ### Features
@@ -110,6 +110,50 @@ If you've already set up the project and are returning to development:
    - Activity tracking
    - Resource management
    - Section organization
+
+### CI/CD Pipeline
+
+The project uses GitHub Actions for automated testing and deployment:
+
+1. **Continuous Integration (CI)**
+   - Runs on every push and pull request to `main`
+   - Automated checks:
+     - TypeScript type checking
+     - ESLint code linting
+     - Database migrations
+     - (Future) Unit and integration tests
+
+2. **Continuous Deployment (CD)**
+   - Triggers on version tags (e.g., v1.0.0)
+   - Automated process:
+     - Builds the application
+     - Runs all tests
+     - Deploys to production
+     - Manages environment variables
+
+3. **Release Process**
+   Each project phase corresponds to a major version:
+   - Phase 1 (v1.x.x): Core Web Application
+   - Phase 2 (v2.x.x): Input Methods & Content
+   - Phase 3 (v3.x.x): AI Integration
+   - Phase 4 (v4.x.x): Portfolio Generation
+   - Phase 5 (v5.x.x): Browser Integration
+   - Phase 6 (v6.x.x): External Device Integration
+   - Phase 7 (v7.x.x): Advanced Features
+
+   Version format: `vMAJOR.MINOR.PATCH`
+   - MAJOR: Breaking changes (new phases)
+   - MINOR: New features
+   - PATCH: Bug fixes and small improvements
+
+4. **Creating a Release**
+   ```bash
+   # Tag a new version
+   git tag -a v1.0.0 -m "Phase 1: Core Web Application"
+   
+   # Push the tag to trigger deployment
+   git push origin v1.0.0
+   ```
 
 ## Project Phases
 
