@@ -33,6 +33,12 @@ export async function GET() {
       auth: account.access_token,
     });
 
+    console.log('GitHub Token:', account.access_token.slice(0, 10) + '...');
+
+    // Log the authenticated user
+    const { data: user } = await octokit.users.getAuthenticated();
+    console.log('Authenticated as:', user.login);
+
     // Fetch user's repositories
     const { data: repositories } = await octokit.repos.listForAuthenticatedUser({
       sort: 'updated',
@@ -42,12 +48,18 @@ export async function GET() {
       affiliation: 'owner,collaborator,organization_member',  // Show all repos user has access to
     });
 
-    // Log the response for debugging
-    console.log('Fetched repositories:', repositories.map(r => ({ 
-      name: r.full_name, 
-      private: r.private,
-      permissions: r.permissions 
-    })));
+    // Log detailed repository information
+    console.log('Repository Access Details:', {
+      total: repositories.length,
+      private: repositories.filter(r => r.private).length,
+      public: repositories.filter(r => !r.private).length,
+      permissions: repositories.map(r => ({
+        name: r.full_name,
+        private: r.private,
+        permissions: r.permissions,
+        visibility: r.visibility
+      }))
+    });
 
     return NextResponse.json({
       repositories: repositories.map(repo => ({

@@ -66,12 +66,16 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    console.log('Fetching README for project:', params.id);
+    
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
+      console.log('Unauthorized: No session or email');
       return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
       });
     }
+    console.log('Authorized user:', session.user.email);
 
     const readme = await prisma.readme.findUnique({
       where: {
@@ -86,15 +90,33 @@ export async function GET(
       },
     });
 
+    console.log('README query result:', {
+      found: !!readme,
+      readmeId: readme?.id,
+      projectId: readme?.projectId,
+      contentLength: readme?.content?.length,
+      versionsCount: readme?.versions?.length,
+    });
+
     if (!readme) {
+      console.log('README not found for project:', params.id);
       return new NextResponse(JSON.stringify({ error: 'README not found' }), {
         status: 404,
       });
     }
 
+    console.log('Successfully returning README with', {
+      versionsCount: readme.versions.length,
+      contentPreview: readme.content.substring(0, 100) + '...'
+    });
+
     return new NextResponse(JSON.stringify(readme));
   } catch (error) {
-    console.error('Error fetching README:', error);
+    console.error('Error fetching README:', {
+      error,
+      projectId: params.id,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error'
+    });
     return new NextResponse(
       JSON.stringify({ error: 'Failed to fetch README' }),
       { status: 500 }

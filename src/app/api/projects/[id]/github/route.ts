@@ -38,16 +38,74 @@ function parseGitHubUrl(url: string) {
 // Helper function to get README content from GitHub
 async function getGitHubReadme(octokit: Octokit, owner: string, repo: string) {
   try {
-    const response = await octokit.repos.getReadme({
+    console.log('Starting README search for:', { owner, repo });
+    
+    // Try common README filenames
+    const commonReadmeNames = ['README.md', 'Readme.md', 'readme.md', 'README'];
+    console.log('Will try these filenames in order:', commonReadmeNames);
+    
+    let response = null;
+    let error = null;
+
+    for (const filename of commonReadmeNames) {
+      try {
+        console.log(`Attempting to fetch: ${filename}`);
+        const result = await octokit.repos.getContent({
+          owner,
+          repo,
+          path: filename,
+        });
+        
+        // Check if we got a file (not a directory) and it has content
+        if ('content' in result.data && typeof result.data.content === 'string') {
+          console.log(`✅ Found valid README at: ${filename}`);
+          response = result;
+          break;
+        } else {
+          console.log(`❌ Found ${filename} but it's not a valid file:`, {
+            type: typeof result.data,
+            hasContent: 'content' in result.data
+          });
+        }
+      } catch (e) {
+        error = e;
+        console.log(`❌ Failed to fetch ${filename}:`, {
+          error: e instanceof Error ? e.message : 'Unknown error'
+        });
+        continue;
+      }
+    }
+
+    if (!response?.data || !('content' in response.data)) {
+      console.error('No README found after trying all filenames:', {
+        error,
+        triedFiles: commonReadmeNames,
+        lastError: error instanceof Error ? error.message : 'Unknown error'
+      });
+      return null;
+    }
+
+    // Get the raw content from base64
+    const content = Buffer.from(response.data.content, 'base64').toString('utf8');
+
+    // Log the response for debugging
+    console.log('README successfully fetched:', {
+      status: response.status,
+      filename: response.data.path,
+      contentLength: content.length,
+      firstFewChars: content.substring(0, 100) + '...',
+      encoding: response.data.encoding,
+      sha: response.data.sha
+    });
+
+    return content;
+  } catch (error) {
+    console.error('Error in getGitHubReadme:', {
+      error,
       owner,
       repo,
-      mediaType: {
-        format: 'raw',
-      },
+      errorMessage: error instanceof Error ? error.message : 'Unknown error'
     });
-    return response.data.content;
-  } catch (error) {
-    console.error('Error fetching README:', error);
     return null;
   }
 }
@@ -153,25 +211,28 @@ export async function POST(
 
     // If README exists on GitHub, create or update project README
     if (readmeContent) {
-      let existingReadme = await prisma.readme.findUnique({
-        where: { projectId: params.id },
-      });
-
       // First, get the current max version
-      const currentVersion = await prisma.readmeVersion.findFirst({
-        where: { readmeId: existingReadme?.id },
-        orderBy: { version: 'desc' },
+      const currentReadme = await prisma.readme.findUnique({
+        where: { projectId: params.id },
+        include: {
+          versions: {
+            orderBy: { version: 'desc' },
+            take: 1,
+          },
+        },
       });
 
-      const nextVersion: number = (currentVersion?.version ?? 0) + 1;
+      const nextVersion = currentReadme?.versions[0]?.version 
+        ? currentReadme.versions[0].version + 1 
+        : 1;
 
       const updatedReadme = await prisma.readme.upsert({
         where: {
           projectId: params.id,
         },
         create: {
-          content: readmeContent,
           projectId: params.id,
+          content: readmeContent,
           versions: {
             create: {
               version: 1,
@@ -190,6 +251,15 @@ export async function POST(
             },
           },
         },
+        include: {
+          versions: true,
+        },
+      });
+
+      console.log('Created/Updated README:', {
+        readmeId: updatedReadme.id,
+        projectId: updatedReadme.projectId,
+        versionsCount: updatedReadme.versions.length,
       });
     }
 

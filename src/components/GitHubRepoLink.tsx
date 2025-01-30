@@ -44,6 +44,7 @@ export default function GitHubRepoLink({ projectId }: GitHubRepoLinkProps) {
           setRepo(data.githubRepo);
           setRepoUrl(data.githubRepo.repoUrl);
         }
+        // console.log(data.githubRepo);
       } catch (error) {
         console.error('Error fetching repo:', error);
       }
@@ -57,8 +58,25 @@ export default function GitHubRepoLink({ projectId }: GitHubRepoLinkProps) {
       setIsLoadingRepos(true);
       try {
         const response = await fetch('/api/github/repositories');
-        if (!response.ok) throw new Error('Failed to fetch repositories');
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Repository fetch error:', {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorData
+          });
+          throw new Error('Failed to fetch repositories');
+        }
         const data = await response.json();
+        console.log('Frontend received repositories:', {
+          total: data.repositories.length,
+          private: data.repositories.filter((r: GithubRepository) => r.private).length,
+          public: data.repositories.filter((r: GithubRepository) => !r.private).length,
+          repos: data.repositories.map((r: GithubRepository) => ({
+            name: r.full_name,
+            private: r.private
+          }))
+        });
         setAvailableRepos(data.repositories);
       } catch (error) {
         console.error('Error fetching repositories:', error);
@@ -159,6 +177,9 @@ export default function GitHubRepoLink({ projectId }: GitHubRepoLinkProps) {
         </div>
       ) : (
         <div className="space-y-4">
+          <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
+            Connect a GitHub repository to sync its README and keep it updated with your project.
+          </div>
           <input
             type="text"
             value={searchTerm}
@@ -173,8 +194,12 @@ export default function GitHubRepoLink({ projectId }: GitHubRepoLinkProps) {
           />
           
           {error && (
-            <div className="text-sm" style={{ color: currentTheme.colors.status.inactive.text }}>
-              {error}
+            <div className="p-3 rounded-md text-sm" style={{ 
+              backgroundColor: currentTheme.colors.status.inactive.background,
+              color: currentTheme.colors.status.inactive.text,
+              border: `1px solid ${currentTheme.colors.border.default}`,
+            }}>
+              Error: {error}
             </div>
           )}
 
@@ -184,39 +209,45 @@ export default function GitHubRepoLink({ projectId }: GitHubRepoLinkProps) {
                 Loading repositories...
               </div>
             ) : filteredRepos.length > 0 ? (
-              filteredRepos.map((repo) => (
-                <div
-                  key={repo.id}
-                  className="flex items-center justify-between p-2 rounded-md hover:bg-black/5"
-                  style={{
-                    backgroundColor: currentTheme.colors.cardBackground,
-                    border: `1px solid ${currentTheme.colors.border.default}`,
-                  }}
-                >
-                  <div className="flex-1">
-                    <div className="font-medium" style={{ color: currentTheme.colors.text.primary }}>
-                      {repo.full_name}
-                    </div>
-                    <div className="text-xs" style={{ color: currentTheme.colors.text.secondary }}>
-                      {repo.private ? 'Private' : 'Public'}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleConnect(repo)}
-                    disabled={loading}
-                    className="px-3 py-1 text-sm rounded-md transition-colors duration-200 disabled:opacity-50"
+              <>
+                <div className="text-xs mb-2" style={{ color: currentTheme.colors.text.secondary }}>
+                  Found {filteredRepos.length} repositories
+                  {searchTerm && ` matching "${searchTerm}"`}
+                </div>
+                {filteredRepos.map((repo) => (
+                  <div
+                    key={repo.id}
+                    className="flex items-center justify-between p-2 rounded-md hover:bg-black/5"
                     style={{
-                      backgroundColor: currentTheme.colors.primary,
-                      color: currentTheme.colors.background,
+                      backgroundColor: currentTheme.colors.cardBackground,
+                      border: `1px solid ${currentTheme.colors.border.default}`,
                     }}
                   >
-                    Connect
-                  </button>
-                </div>
-              ))
+                    <div className="flex-1">
+                      <div className="font-medium" style={{ color: currentTheme.colors.text.primary }}>
+                        {repo.full_name}
+                      </div>
+                      <div className="text-xs" style={{ color: currentTheme.colors.text.secondary }}>
+                        {repo.private ? '🔒 Private' : '🌐 Public'} repository
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleConnect(repo)}
+                      disabled={loading}
+                      className="px-3 py-1 text-sm rounded-md transition-colors duration-200 disabled:opacity-50"
+                      style={{
+                        backgroundColor: currentTheme.colors.primary,
+                        color: currentTheme.colors.background,
+                      }}
+                    >
+                      {loading ? 'Connecting...' : 'Connect'}
+                    </button>
+                  </div>
+                ))}
+              </>
             ) : (
               <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
-                No repositories found
+                {searchTerm ? `No repositories found matching "${searchTerm}"` : 'No repositories found'}
               </div>
             )}
           </div>
