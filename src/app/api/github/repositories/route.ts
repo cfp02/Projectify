@@ -49,17 +49,17 @@ export async function GET() {
     });
 
     // Log detailed repository information
-    console.log('Repository Access Details:', {
-      total: repositories.length,
-      private: repositories.filter(r => r.private).length,
-      public: repositories.filter(r => !r.private).length,
-      permissions: repositories.map(r => ({
-        name: r.full_name,
-        private: r.private,
-        permissions: r.permissions,
-        visibility: r.visibility
-      }))
-    });
+    // console.log('Repository Access Details:', {
+    //   total: repositories.length,
+    //   private: repositories.filter(r => r.private).length,
+    //   public: repositories.filter(r => !r.private).length,
+    //   permissions: repositories.map(r => ({
+    //     name: r.full_name,
+    //     private: r.private,
+    //     permissions: r.permissions,
+    //     visibility: r.visibility
+    //   }))
+    // });
 
     return NextResponse.json({
       repositories: repositories.map(repo => ({

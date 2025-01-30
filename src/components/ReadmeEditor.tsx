@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import type { Components } from 'react-markdown';
 
 interface ReadmeVersion {
   id: string;
@@ -33,6 +36,7 @@ export function ReadmeEditor({ projectId, initialReadme }: ReadmeEditorProps) {
   const [loading, setLoading] = useState(!initialReadme);
   const [error, setError] = useState<string | null>(null);
   const [showVersions, setShowVersions] = useState(false);
+  const [zoom, setZoom] = useState<'normal' | 'in' | 'out'>('normal');
 
   useEffect(() => {
     if (!initialReadme) {
@@ -110,6 +114,33 @@ export function ReadmeEditor({ projectId, initialReadme }: ReadmeEditorProps) {
     }
   };
 
+  // Define markdown components with proper typing
+  const markdownComponents: Components = {
+    details: ({ children, ...props }) => (
+      <details 
+        className="my-4 p-4 rounded-lg" 
+        style={{
+          backgroundColor: `${currentTheme.colors.background}22`,
+          border: `1px solid ${currentTheme.colors.border.default}`,
+        }} 
+        {...props}
+      >
+        {children}
+      </details>
+    ),
+    summary: ({ children, ...props }) => (
+      <summary 
+        className="cursor-pointer font-medium" 
+        style={{
+          color: currentTheme.colors.text.primary,
+        }} 
+        {...props}
+      >
+        {children}
+      </summary>
+    ),
+  };
+
   if (loading) {
     return (
       <div className="animate-pulse" style={{ color: currentTheme.colors.text.secondary }}>
@@ -133,6 +164,34 @@ export function ReadmeEditor({ projectId, initialReadme }: ReadmeEditorProps) {
           README
         </h2>
         <div className="flex gap-2">
+          {!isEditing && (
+            <div className="flex gap-1 mr-2">
+              <button
+                onClick={() => setZoom(zoom === 'out' ? 'normal' : 'out')}
+                className="px-2 py-1 rounded-md text-sm transition-colors duration-200"
+                style={{
+                  backgroundColor: zoom === 'out' ? currentTheme.colors.primary : currentTheme.colors.cardBackground,
+                  color: zoom === 'out' ? currentTheme.colors.background : currentTheme.colors.text.primary,
+                  border: `1px solid ${currentTheme.colors.border.default}`,
+                }}
+                title="Zoom Out"
+              >
+                -
+              </button>
+              <button
+                onClick={() => setZoom(zoom === 'in' ? 'normal' : 'in')}
+                className="px-2 py-1 rounded-md text-sm transition-colors duration-200"
+                style={{
+                  backgroundColor: zoom === 'in' ? currentTheme.colors.primary : currentTheme.colors.cardBackground,
+                  color: zoom === 'in' ? currentTheme.colors.background : currentTheme.colors.text.primary,
+                  border: `1px solid ${currentTheme.colors.border.default}`,
+                }}
+                title="Zoom In"
+              >
+                +
+              </button>
+            </div>
+          )}
           <button
             onClick={() => setShowVersions(!showVersions)}
             className="px-3 py-1 rounded-md text-sm transition-colors duration-200"
@@ -257,15 +316,25 @@ export function ReadmeEditor({ projectId, initialReadme }: ReadmeEditorProps) {
         </div>
       ) : (
         <div
-          className="prose prose-invert max-w-none p-6 rounded-lg"
+          className={`prose prose-invert max-w-none p-6 rounded-lg readme-content ${
+            zoom === 'in' ? 'zoomed-in' : zoom === 'out' ? 'zoomed-out' : ''
+          }`}
           style={{
             backgroundColor: currentTheme.colors.cardBackground,
             border: `1px solid ${currentTheme.colors.border.default}`,
             color: currentTheme.colors.text.primary,
+            ['--tw-prose-invert-headings' as string]: currentTheme.colors.primary,
+            ['--tw-prose-invert-links' as string]: currentTheme.colors.primary,
           }}
         >
           {readme ? (
-            <ReactMarkdown>{readme.content}</ReactMarkdown>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw]}
+              components={markdownComponents}
+            >
+              {readme.content}
+            </ReactMarkdown>
           ) : (
             <div className="text-center py-8">
               <p style={{ color: currentTheme.colors.text.secondary }}>
