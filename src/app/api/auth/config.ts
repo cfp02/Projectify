@@ -23,6 +23,7 @@ export const authOptions: AuthOptions = {
       authorization: {
         params: {
           scope: 'repo read:user user:email',
+          allow_signup: true,
         },
       },
     }),

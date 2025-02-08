@@ -16,16 +16,17 @@ export async function GET() {
     // Get the user's GitHub access token
     const account = await prisma.account.findFirst({
       where: {
-        userId: session.user.id,
+        userId: session.user.id as string,
         provider: 'github',
       },
     });
 
     if (!account?.access_token) {
-      return NextResponse.json(
-        { error: 'GitHub account not connected' },
-        { status: 400 }
-      );
+      // Instead of forcing a reauth, just return empty repositories
+      return NextResponse.json({
+        repositories: [],
+        status: 'no_connection'
+      });
     }
 
     // Initialize Octokit with the user's token
@@ -33,48 +34,42 @@ export async function GET() {
       auth: account.access_token,
     });
 
-    console.log('GitHub Token:', account.access_token.slice(0, 10) + '...');
+    try {
+      // Fetch user's repositories
+      const { data: repositories } = await octokit.repos.listForAuthenticatedUser({
+        sort: 'updated',
+        direction: 'desc',
+        per_page: 100,
+        visibility: 'all',
+        affiliation: 'owner,collaborator,organization_member',
+      });
 
-    // Log the authenticated user
-    const { data: user } = await octokit.users.getAuthenticated();
-    console.log('Authenticated as:', user.login);
-
-    // Fetch user's repositories
-    const { data: repositories } = await octokit.repos.listForAuthenticatedUser({
-      sort: 'updated',
-      direction: 'desc',
-      per_page: 100,
-      visibility: 'all',  // Show both private and public repos
-      affiliation: 'owner,collaborator,organization_member',  // Show all repos user has access to
-    });
-
-    // Log detailed repository information
-    // console.log('Repository Access Details:', {
-    //   total: repositories.length,
-    //   private: repositories.filter(r => r.private).length,
-    //   public: repositories.filter(r => !r.private).length,
-    //   permissions: repositories.map(r => ({
-    //     name: r.full_name,
-    //     private: r.private,
-    //     permissions: r.permissions,
-    //     visibility: r.visibility
-    //   }))
-    // });
-
-    return NextResponse.json({
-      repositories: repositories.map(repo => ({
-        id: repo.id,
-        name: repo.name,
-        full_name: repo.full_name,
-        private: repo.private,
-        html_url: repo.html_url,
-      })),
-    });
+      return NextResponse.json({
+        repositories: repositories.map(repo => ({
+          id: repo.id,
+          name: repo.name,
+          full_name: repo.full_name,
+          private: repo.private,
+          html_url: repo.html_url,
+        })),
+        status: 'connected'
+      });
+    } catch (error: any) {
+      if (error.status === 401) {
+        // Instead of forcing a reauth, return empty repositories with a status
+        return NextResponse.json({
+          repositories: [],
+          status: 'token_expired'
+        });
+      }
+      throw error;
+    }
   } catch (error) {
     console.error('Error fetching repositories:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch repositories' },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      repositories: [],
+      status: 'error',
+      error: 'Failed to fetch repositories'
+    });
   }
 } 

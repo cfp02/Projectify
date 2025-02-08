@@ -52,12 +52,17 @@ export function ProjectSidebar({ currentProjectId, sections }: ProjectSidebarPro
     >
       <div className="p-4">
         <div className="mb-6">
-          <h2 
-            className="text-sm font-semibold mb-2 px-2"
-            style={{ color: currentTheme.colors.text.secondary }}
+          <Link
+            href="/projects"
+            className="flex items-center gap-2 px-3 py-2 mb-4 rounded-md text-sm font-medium w-full transition-colors duration-200 hover:bg-opacity-10"
+            style={{ 
+              color: currentTheme.colors.primary,
+              backgroundColor: `${currentTheme.colors.primary}05`,
+            }}
           >
-            Recent Projects
-          </h2>
+            <span>←</span>
+            <span>All Projects</span>
+          </Link>
           {loading ? (
             <div 
               className="animate-pulse text-sm px-2"

@@ -8,6 +8,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { ReadmeEditor } from "@/components/ReadmeEditor";
 import GitHubRepoLink from "@/components/GitHubRepoLink";
 import { CollapsibleSection } from '@/components/CollapsibleSection';
+import { SectionEditor } from '@/components/SectionEditor';
 
 interface Tag {
   id: string;
@@ -231,17 +232,6 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
   return (
     <div className="min-h-screen py-8 px-4" style={{ backgroundColor: currentTheme.colors.background }}>
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <Link
-            href="/projects"
-            className="flex items-center gap-2 transition-colors duration-200"
-            style={{ color: currentTheme.colors.primary }}
-          >
-            <span>←</span>
-            <span>Back to Projects</span>
-          </Link>
-        </div>
-
         <div className="space-y-6">
           {/* Project Header Section */}
           <CollapsibleSection title="Project Details" defaultExpanded={true}>
@@ -254,7 +244,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
                     onChange={(e) =>
                       setEditedProject({ ...editedProject, title: e.target.value })
                     }
-                    className="w-full mb-2 p-2 rounded-lg"
+                    className="w-full text-xl mb-1 p-2 rounded-lg"
                     style={{
                       backgroundColor: currentTheme.colors.background,
                       color: currentTheme.colors.text.primary,
@@ -262,7 +252,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
                     }}
                   />
                 ) : (
-                  <h1 className="text-4xl font-bold mb-2" style={{ color: currentTheme.colors.primary }}>
+                  <h1 className="text-2xl font-bold mb-1" style={{ color: currentTheme.colors.primary }}>
                     {project.title}
                   </h1>
                 )}
@@ -273,7 +263,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
                     onChange={(e) =>
                       setEditedProject({ ...editedProject, subtitle: e.target.value })
                     }
-                    className="w-full p-2 rounded-lg"
+                    className="w-full text-sm p-2 rounded-lg"
                     style={{
                       backgroundColor: currentTheme.colors.background,
                       color: currentTheme.colors.text.secondary,
@@ -282,7 +272,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
                   />
                 ) : (
                   project.subtitle && (
-                    <p style={{ color: currentTheme.colors.text.secondary }} className="text-xl">
+                    <p style={{ color: currentTheme.colors.text.secondary }} className="text-sm">
                       {project.subtitle}
                     </p>
                   )
@@ -342,14 +332,28 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
             </div>
           </CollapsibleSection>
 
+          {/* README Section */}
+          <CollapsibleSection title="README" defaultExpanded={true}>
+            <ReadmeEditor projectId={params.id} />
+          </CollapsibleSection>
+
           {/* GitHub Integration Section */}
           <CollapsibleSection title="GitHub Integration" defaultExpanded={true}>
             <GitHubRepoLink projectId={params.id} />
           </CollapsibleSection>
 
-          {/* README Section */}
-          <CollapsibleSection title="README" defaultExpanded={true}>
-            <ReadmeEditor projectId={params.id} />
+          {/* Project Sections */}
+          <CollapsibleSection title="Project Sections" defaultExpanded={true}>
+            <SectionEditor 
+              projectId={params.id} 
+              initialSections={project.sections}
+              onSectionsChange={(updatedSections: Section[]) => {
+                setProject(prev => prev ? {
+                  ...prev,
+                  sections: updatedSections
+                } : null)
+              }}
+            />
           </CollapsibleSection>
 
           {/* Version History Section */}
