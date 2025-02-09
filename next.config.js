@@ -13,11 +13,7 @@ const nextConfig = {
     ],
   },
   // Optimize for Vercel deployment
-  output: 'standalone',
-  // Disable static image imports for dynamic OAuth provider images
-  experimental: {
-    serverActions: true,
-  },
+  output: 'standalone'
 }
 
 module.exports = nextConfig 
