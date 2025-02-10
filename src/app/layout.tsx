@@ -9,6 +9,16 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Projectify',
   description: 'Project Management and Portfolio Platform',
+  icons: {
+    icon: [
+      {
+        url: '/icon.svg',
+        type: 'image/svg+xml',
+      }
+    ],
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
 };
 
 export default function RootLayout({
